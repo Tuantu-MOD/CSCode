@@ -56,6 +56,7 @@ namespace Tuantu.WishrootCreature
         {
             if(e.Data.Name == "Damage" && parasite._target != null && parasite.InRange(parasite._target, 2.3f))
             {
+                SoundEffectPlayer.PlayOnce_Mod("Tuantu_MOD", "Sword_Stab", parasite.model.GetCurrentViewPosition());
                 if(!parasite.InView(parasite._target))
                     return;
                 parasite._target.TakeDamage(parasite.model, new DamageInfo(RwbpType.P, 5, 9));

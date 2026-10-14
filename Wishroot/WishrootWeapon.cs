@@ -153,6 +153,7 @@ namespace Tuantu.WishrootCreature
         {
             if(e.Data.Name == "Spike_A")
             {
+                SoundEffectPlayer.PlayOnce_Mod("Tuantu_MOD", "Spike_Hit", worker.GetCurrentViewPosition());
                 GiveDamage();
             }
             if(e.Data.Name == "Damage")
@@ -161,6 +162,7 @@ namespace Tuantu.WishrootCreature
                 {
                     if(InView(_target))
                     {
+                        SoundEffectPlayer.PlayOnce_Mod("Tuantu_MOD", "Hammer_Swing", worker.GetCurrentViewPosition());
                         _target.TakeDamage(_actor, base.model.metaInfo.damageInfos[0].Copy());
                     }
                     if(!noradd)
@@ -173,10 +175,12 @@ namespace Tuantu.WishrootCreature
                 {
                     if(attStack >= 0 && attStack <= 4)
                     {
+                        SoundEffectPlayer.PlayOnce_Mod("Tuantu_MOD", "Sling_Shot", worker.GetCurrentViewPosition());
                         _target.TakeDamage(_actor, base.model.metaInfo.damageInfos[2].Copy());
                     }
                     else if(attStack >= 5)
                     {
+                        SoundEffectPlayer.PlayOnce_Mod("Tuantu_MOD", "Sword_HitandImpact", worker.GetCurrentViewPosition());
                         _target.TakeDamage(_actor, base.model.metaInfo.damageInfos[3].Copy());
                     }
                 }
