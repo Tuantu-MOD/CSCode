@@ -28,6 +28,7 @@ namespace Tuantu.SicklerCreature
         public override void OnPrepareWeapon(UnitModel actor)
         {
             actor.hp -= (float)actor.maxHp * 0.3f;
+            SoundEffectPlayer.PlayOnce_Mod("Tuantu_MOD", "SicklerWeapon_equip", (Vector2)actor.GetCurrentViewPosition());
             if(!spawn || agentHunter == null)
             {
                 MakeHunter();
@@ -90,7 +91,10 @@ namespace Tuantu.SicklerCreature
         public void OnEvent(TrackEntry entry, Event e)
         {
             if(e.Data.Name == "Haunt")
+            {
+                SoundEffectPlayer.PlayOnce_Mod("Tuantu_MOD","SicklerWeapon_Spawn", (Vector2)agent.GetCurrentViewPosition());
                 SpawnHunter();
+            }
         }
 
         public override WeaponDamageInfo OnAttackStart(UnitModel actor, UnitModel target)

@@ -1,19 +1,21 @@
 using Spine;
 using Spine.Unity;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Tuantu.SicklerCreature
 {
     public class SicklerAnim : CreatureAnimScript
     {
         private Sickler sickler;
+        private SoundEffectPlayer idlePlayer;
+        private SoundEffectPlayer escapePlayer;
         private new SkeletonAnimation animator;
 
         public void SetScript(Sickler _sickler)
         {
             sickler = _sickler;
             animator = base.gameObject.GetComponent<SkeletonAnimation>();
-            Idle();
         }
 
         public void PlayDead()
@@ -33,7 +35,10 @@ namespace Tuantu.SicklerCreature
 
         public void Idle()
         {
+            if(escapePlayer != null)
+                Destroy(escapePlayer.gameObject);
             animator.AnimationState.SetAnimation(0, "Idle", true);
+            idlePlayer = SoundEffectPlayer.Play_Mod("Tuantu_MOD", "Sickler_Idle", animator.transform, 1f, 1f, AudioRolloffMode.Logarithmic);
         }
 
         public void Attack1()
@@ -59,6 +64,7 @@ namespace Tuantu.SicklerCreature
 
         public void OnScream(List<UnitModel> targets)
         {
+            SoundEffectPlayer.PlayOnce_Mod("Tuantu_MOD", "Sickler_FirstScream", (Vector2)sickler.model.GetCurrentViewPosition(), 1f);
             TrackEntry entry = animator.AnimationState.SetAnimation(0, "Scream", false);
             entry.Event += (TrackEntry ent, Event e) =>
             {
@@ -76,6 +82,9 @@ namespace Tuantu.SicklerCreature
                 sickler.breaked = true;
                 sickler.firstTargeting = false;
                 sickler.AnyMove();
+                if(idlePlayer != null)
+                    Destroy(idlePlayer.gameObject);
+                escapePlayer = SoundEffectPlayer.Play_Mod("Tuantu_MOD", "Sickler_EscapeScream", animator.transform, 1f, 1f, AudioRolloffMode.Logarithmic);
             };
         }
         public void Damage(TrackEntry entry, Event e)

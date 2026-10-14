@@ -176,6 +176,7 @@ namespace Tuantu.WishrootCreature
                 attacktimer.StartTimer(2.5f);
                 // 공격 중(false는 애니메이션 클래스에서 조정함)
                 attacking = true;
+
                 // 공격 애니메이션
                 switch(attn)
                 {
