@@ -1,7 +1,7 @@
 로보토미 기반모드 치트
 
 환상체 추가
-standard fifo (환상체 id)
+standard fifo_mod Tuantu_MOD (환상체 id)
 
 에너지 추가
 standard expectopatronum (수량)
