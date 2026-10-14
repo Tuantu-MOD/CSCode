@@ -60,6 +60,7 @@ namespace Tuantu.SicklerCreature
             base.OnStageStart();
             sefira = model.GetCurrentNode().GetAttachedPassage().GetSefira();
             ParamInit();
+            anim.Idle();
         }
 
         public override void OnWorkCoolTimeEnd(CreatureFeelingState state)

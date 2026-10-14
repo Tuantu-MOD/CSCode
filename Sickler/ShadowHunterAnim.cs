@@ -64,18 +64,21 @@ namespace Tuantu.SicklerCreature
         {
             if(e.Data.Name == "Damage" && shadowHunter._target != null && shadowHunter.InRange(shadowHunter._target, shadowHunter.range))
             {
+                SoundEffectPlayer.PlayOnce_Mod("Tuantu_MOD", "ShadowHunter_Swing", (Vector2)shadowHunter.model.GetCurrentViewPosition(), 0.5f);
                 if(!shadowHunter.InView(shadowHunter._target))
                     return;
                 shadowHunter._target.TakeDamage(((UnitModel)shadowHunter.model), shadowHunter.att1dmg);
             }
             else if(e.Data.Name == "Damage2" && shadowHunter._target != null && shadowHunter.InRange(shadowHunter._target, shadowHunter.range))
             {
+                SoundEffectPlayer.PlayOnce_Mod("Tuantu_MOD", "ShadowHunter_Swing", (Vector2)shadowHunter.model.GetCurrentViewPosition(), 0.5f);
                 if(!shadowHunter.InView(shadowHunter._target))
                     return;
                 shadowHunter._target.TakeDamage(((UnitModel)shadowHunter.model), shadowHunter.att2dmg);
             }
             else if(e.Data.Name == "HeavyDamage" && shadowHunter._target != null && shadowHunter.InRange(shadowHunter._target, shadowHunter.range))
             {
+                SoundEffectPlayer.PlayOnce_Mod("Tuantu_MOD", "ShadowHunter_Swing", (Vector2)shadowHunter.model.GetCurrentViewPosition(), 0.5f);
                 if(!shadowHunter.InView(shadowHunter._target))
                     return;
                 shadowHunter._target.TakeDamage(((UnitModel)shadowHunter.model), shadowHunter.heavydmg);
