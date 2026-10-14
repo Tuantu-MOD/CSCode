@@ -1,6 +1,7 @@
 Tuantu.csproj에 HintPath에 넣을 dll 파일들은 니가 알아서 넣으세요.
 
 /Users/[유저명]/Applications/Sikarugir/[sikarugir에서 만든 스팀 앱 이름].app/Contents/SharedSupport/prefix/drive_c/Program Files (x86)/Steam/steamapps/common/LobotomyCorp/LobotomyCorp_Data/Managed/Assembly-CSharp.dll
+
 대강 이 경로임. 윈도우는 
 
 C\ProgramFiles(x86)\Steam\steamapps\common\LobotomyCorp\LobotomyCorp_Data\Managed\Assembly-CSharp.dll
