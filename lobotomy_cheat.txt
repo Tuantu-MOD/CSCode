@@ -9,5 +9,11 @@ standard expectopatronum (수량)
 PE-box 생성(모든 환상체에게 적용, 1000개)
 creature cakeislie 1 1000
 
+클리포트카운터 감소
+creature cakeislie global 1 1000
+
 LOB 포인트 생성
 standard salmonsushi [int 값(생성 수량)]
+다른 치트를 원한다면
+
+-> https://gall.dcinside.com/mgallery/board/view/?id=lobotomycorporation&no=50238
