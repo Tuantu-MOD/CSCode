@@ -1,0 +1,13 @@
+로보토미 기반모드 치트
+
+환상체 추가
+standard fifo (환상체 id)
+
+에너지 추가
+standard expectopatronum (수량)
+
+PE-box 생성(모든 환상체에게 적용, 1000개)
+creature cakeislie 1 1000
+
+LOB 포인트 생성
+standard salmonsushi [int 값(생성 수량)]
