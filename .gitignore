@@ -1,0 +1,15 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# .NET
+obj/
+bin/
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
