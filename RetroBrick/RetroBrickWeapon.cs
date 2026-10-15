@@ -13,6 +13,8 @@ namespace Tuantu.RetroBrickCreature
             list.Add(base.model.metaInfo.damageInfos[0].Copy());
             animname = base.model.metaInfo.animationNames[0];
 
+            SoundEffectPlayer.PlayOnce_Mod("Tuantu_MOD", "Sword_Classic", actor.GetCurrentViewPosition());
+
             return new WeaponDamageInfo(animname, list.ToArray());    
         }
     }
