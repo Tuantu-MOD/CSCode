@@ -65,6 +65,7 @@ namespace Tuantu.SkyboxCreature
             int damageGuarantee = 1;
             if(e.Data.Name == "Damage_Basic")
             {
+                SoundEffectPlayer.PlayOnce("Weapons/spear1", agent.GetCurrentViewPosition());
                 DamageInfo originDamage = model.metaInfo.damageInfos[0];
                 DamageInfo baseDamage = new DamageInfo(originDamage.type, (int)originDamage.min, (int)originDamage.max);
                 if(isSet)
@@ -77,6 +78,7 @@ namespace Tuantu.SkyboxCreature
             }
             if(e.Data.Name == "Damage_SkyThrust")
             {
+                SoundEffectPlayer.PlayOnce("Weapons/spear1", agent.GetCurrentViewPosition());
                 DamageInfo originDamage = model.metaInfo.damageInfos[1];
                 DamageInfo baseDamage = new DamageInfo(originDamage.type, (int)originDamage.min, (int)originDamage.max);
                 baseDamage.min += thurstAttNum * 0.3f;
@@ -98,6 +100,7 @@ namespace Tuantu.SkyboxCreature
             }
             if(e.Data.Name == "Damage_SoaringSky")
             {
+                SoundEffectPlayer.PlayOnce_Mod("Tuantu_MOD", "Strike_Heavy", agent.GetCurrentViewPosition());
                 DamageInfo originDamage = model.metaInfo.damageInfos[2];
                 DamageInfo baseDamage = new DamageInfo(originDamage.type, (int)originDamage.min, (int)originDamage.max);
                 if(isSet)
@@ -111,6 +114,8 @@ namespace Tuantu.SkyboxCreature
                     baseDamage.max *= soaring * 0.3f + damageGuarantee;
                 }
                 soaring = 0;
+                baseDamage.min = Mathf.Max(baseDamage.min, 100f);
+                baseDamage.max = Mathf.Max(baseDamage.max, 100f);
 
                 foreach(UnitModel _target in soaringSkyTargets)
                 {
@@ -120,6 +125,7 @@ namespace Tuantu.SkyboxCreature
             }
             if(e.Data.Name == "Damage_AerialBash")
             {
+                SoundEffectPlayer.PlayOnce_Mod("Tuantu_MOD", "Shield_Bash", agent.GetCurrentViewPosition());
                 DamageInfo originDamage = model.metaInfo.damageInfos[3];
                 DamageInfo baseDamage = new DamageInfo(originDamage.type, (int)originDamage.min, (int)originDamage.max);
                 baseDamage.min *= soaring * 0.1f + damageGuarantee;
@@ -133,6 +139,7 @@ namespace Tuantu.SkyboxCreature
             }
             if(e.Data.Name == "Damage_AerialThrust")
             {
+                SoundEffectPlayer.PlayOnce("Weapons/spear2", agent.GetCurrentViewPosition());
                 DamageInfo originDamage = model.metaInfo.damageInfos[4];
                 DamageInfo baseDamage = new DamageInfo(originDamage.type, (int)originDamage.min, (int)originDamage.max);
                 float applySoaring = soaring * 0.1f;
