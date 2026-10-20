@@ -98,15 +98,22 @@ public class Influence : CreatureBase
     public override void ActivateQliphothCounter()
     {
         base.ActivateQliphothCounter();
-        
-        SpawnEclipsedOfAce();
         Escape();
+
+        try
+        {
+            SpawnEclipsedOfAce();
+        }
+        catch (System.Exception ex)
+        {
+            UnityEngine.Debug.Log("SpawnEclipsedOfAce failed: " + ex);
+        }
     }
 
     public override void Escape()
     {
         base.Escape();
-        _currentSefira = model.GetCurrentNode().GetAttachedPassage().GetSefira();
+        _currentSefira = model.sefira;
         if (_currentSefira == null)
         {
             UnityEngine.Debug.LogWarning("Influence.Escape: CurrentSefira null");

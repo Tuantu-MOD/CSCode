@@ -21,11 +21,11 @@ public class InfluenceAnim : CreatureAnimScript
 
     public void Escape_Idle()
     {
-        animator.AnimationState.SetAnimation(0, "Escape_Idle", true);
+        animator.AnimationState.SetAnimation(0, "Idle", true);
     }
 
     public void PlayDead()
     {
-        animator.AnimationState.SetAnimation(0, "Dead", false);
+        animator.AnimationState.SetAnimation(0, "Idle", false);
     }
 }

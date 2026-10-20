@@ -8,7 +8,7 @@ namespace Tuantu.InfluenceCreature
 {
     public class InfluenceWeapon : EquipmentScriptBase
     {
-        private const float _skillCoolTime = 60f;
+        private const float _skillCoolTime = 30f;
         private Timer _skillCoolTimer = new Timer();
         private AutoTimer _closeTimer;
         private WorkerModel worker;
@@ -20,6 +20,23 @@ namespace Tuantu.InfluenceCreature
         private MovableObjectNode movable;
         private PassageObjectModel currentPassagg;
         int attStack;
+        float upSpikeTime = 0.4f;
+        Timer _spikeTimer = new Timer();
+        private SkeletonDataAsset _spikeData;
+        private Vector3 _spikePos;
+        private Vector3 _spikeEndPos;
+        private float _spikeMoveX;
+        private float _spikeScale;
+        private bool _spikeLookRight;
+        private int _spikesLeft;
+        private const int _maxSpikes = 5;
+        private const float _spikeGap = 3.0f;
+        private const float _spikeSizeMultiplier = 2.5f;
+        private float _normalRange;
+        private const float _spikeLifeTime = 3.0f;
+        private float _spikeSpacing;
+        private PassageObjectModel _spikePassage;
+        private List<GameObject> _spikeObjects = new List<GameObject>();
 
         private void Init()
         {
@@ -30,15 +47,21 @@ namespace Tuantu.InfluenceCreature
             _isSpecialAttack = false;
             movable = worker.GetMovableNode();
             currentPassagg = movable.GetPassage();
+            if (_normalRange <= 0f)
+            {
+                _normalRange = base.model.metaInfo.range;
+            }
         }
 
         private void SetEffectActive(bool state)
         {
+            if (_skillEffect == null) return;
             _skillEffect.SetActive(state);
         }
 
         private void ClearEffect()
         {
+            if (_skillEffect == null) return;
             UnityEngine.Object.Destroy(_skillEffect);
             _skillEffect = null;
         }
@@ -54,6 +77,16 @@ namespace Tuantu.InfluenceCreature
         {
             base.OnStageRelease();
             ClearEffect();
+            foreach (GameObject spike in _spikeObjects)
+            {
+                if (spike != null) UnityEngine.Object.Destroy(spike);
+            }
+            _spikeObjects.Clear();
+            _spikesLeft = 0;
+            if (_normalRange > 0f)
+            {
+                base.model.metaInfo.range = _normalRange;
+            }
         }
 
         public override void OnPrepareWeapon(UnitModel actor)
@@ -71,7 +104,7 @@ namespace Tuantu.InfluenceCreature
         {
             if (_isSpecialAttack)
             {
-                _skillCoolTimer.StartTimer(60f);
+                _skillCoolTimer.StartTimer(_skillCoolTime);
                 _isSpecialAttack = false;
             }
         }
@@ -108,47 +141,118 @@ namespace Tuantu.InfluenceCreature
 
         private void MakeSpike()
         {
-            float moveX = 3.0f;
             if (!Add_On.instance.EffectList.TryGetValue("Influence_Spike", out var value))
             {
                 return;
             }
-            GameObject effect = SkeletonAnimation.NewSkeletonAnimationGameObject(value).gameObject;
-            SkeletonAnimation animator = effect.GetComponent<SkeletonAnimation>();
-            CustomEffect component = effect.GetComponent<CustomEffect>();
             Vector3 viewPos = base.model.owner.GetCurrentViewPosition();
-            UnitDirection unit  = movable.GetDirection();
-            float currentScale = ((WorkerModel)base.model.owner).GetMovableNode().currentScale;
-            
-            Vector3 pos = new Vector3(viewPos.x, viewPos.y -1f, viewPos.z -5f);
-            Vector3 endPos = GetPassageEndInFront();
+
+            _spikeData = value;
+            _spikeLookRight = movable.GetDirection() == UnitDirection.RIGHT;
+            _spikeScale = movable.currentScale * _spikeSizeMultiplier;
+            _spikeSpacing = GetSpikeWidth(value, _spikeScale);
+            _spikeMoveX = _spikeLookRight ? _spikeSpacing : -_spikeSpacing;
+            _spikePassage = movable.GetPassage();
+            _spikePos = new Vector3(viewPos.x, viewPos.y - 1f, viewPos.z - 5f);
+            _spikeEndPos = GetPassageEndInFront();
+            _spikesLeft = _maxSpikes;
+
+            SpawnNextSpike();
+        }
+
+        private void SpawnNextSpike()
+        {
+            bool passedEnd = _spikeLookRight ? _spikePos.x > _spikeEndPos.x : _spikePos.x < _spikeEndPos.x;
+            bool isFirst = _spikesLeft == _maxSpikes;
+            if (_spikeData == null || (passedEnd && !isFirst))
+            {
+                _spikesLeft = 0;
+                return;
+            }
+
+            SpawnSpike(_spikeData, _spikePos, _spikeScale, _spikeSpacing * 0.5f);
+            _spikePos.x += _spikeMoveX;
+            _spikesLeft--;
+
+            if (_spikesLeft > 0)
+            {
+                _spikeTimer.StartTimer(upSpikeTime);
+            }
+        }
+
+        private void SpawnSpike(SkeletonDataAsset data, Vector3 pos, float scale, float halfWidth)
+        {
+            GameObject effect = SkeletonAnimation.NewSkeletonAnimationGameObject(data).gameObject;
+            SkeletonAnimation animator = effect.GetComponent<SkeletonAnimation>();
+
+            effect.transform.SetParent(EffectLayer.currentLayer.transform);
+            effect.transform.position = pos;
+            effect.transform.localScale = new Vector3(scale, scale, 2f);
+
+            _spikeObjects.RemoveAll(o => o == null);
+            _spikeObjects.Add(effect);
+            UnityEngine.Object.Destroy(effect, _spikeLifeTime);
+
+            float spikeX = pos.x;
+            PassageObjectModel passage = _spikePassage;
             TrackEntry entry = animator.AnimationState.SetAnimation(0, "Spike", false);
 
-            while (true)
+            UnityEngine.Debug.Log("[InfluenceSpike] spawn x=" + spikeX + " halfWidth=" + halfWidth + " passage=" + (passage == null ? "null" : "ok"));
+
+            entry.Event += (trackEntry, e) =>
             {
-                if(Mathf.Abs(pos.x) >= Mathf.Abs(endPos.x))
+                UnityEngine.Debug.Log("[InfluenceSpike] event=" + e.Data.Name);
+                if (e.Data.Name == "Damage")
                 {
-                    break;
-                }
-                effect.transform.SetParent(EffectLayer.currentLayer.transform);
-                effect.transform.localScale = new Vector3(currentScale, currentScale, 2f);
-                effect.transform.position = pos;
-                List<CreatureModel> list = GetCreaturesInRange(pos, currentScale);
-                entry.Event += (TrackEntry, e) =>
-                {
-                    if(e.Data.Name == "Dmage")
+                    List<UnitModel> targets = GetEnemiesOnSpike(passage, spikeX, halfWidth);
+                    UnityEngine.Debug.Log("[InfluenceSpike] targets=" + targets.Count);
+                    foreach (UnitModel item in targets)
                     {
-                        foreach(UnitModel item in list){
-                            item.TakeDamage(base.model.metaInfo.damageInfos[1].Copy());
-                        }
+                        item.TakeDamage(base.model.owner, base.model.metaInfo.damageInfos[1].Copy());
                     }
-                };
-                pos.x += moveX;
+                }
             };
-            entry.Complete += (trackEntry) =>
+        }
+
+        private List<UnitModel> GetEnemiesOnSpike(PassageObjectModel passage, float spikeX, float halfWidth)
+        {
+            List<UnitModel> result = new List<UnitModel>();
+            if (passage == null) return result;
+
+            foreach (MovableObjectNode node in passage.GetEnteredTargets(movable))
             {
-                UnityEngine.Object.Destroy(effect);
-            };
+                UnitModel unit = node.GetUnit();
+                if (unit == null) continue;
+                UnityEngine.Debug.Log("[InfluenceSpike] in passage: " + unit.GetType().Name + " hp=" + unit.hp + " x=" + unit.GetCurrentViewPosition().x);
+                if (unit.hp <= 0f || !IsSpikeTarget(unit)) continue;
+
+                float x = unit.GetCurrentViewPosition().x;
+                if (Mathf.Abs(x - spikeX) <= halfWidth + unit.radius)
+                {
+                    result.Add(unit);
+                }
+            }
+            return result;
+        }
+
+        private bool IsSpikeTarget(UnitModel unit)
+        {
+            if (unit is CreatureModel) return true;
+
+            if (unit is WorkerModel target && target != worker)
+            {
+                if (!target.IsAttackTargetable()) return false;
+                if (target.IsPanic()) return true;
+                return worker != null && worker.IsHostile(target);
+            }
+            return false;
+        }
+
+        private float GetSpikeWidth(SkeletonDataAsset data, float scale)
+        {
+            SkeletonData skeletonData = data.GetSkeletonData(true);
+            if (skeletonData == null || skeletonData.Width <= 0f) return _spikeGap;
+            return skeletonData.Width * data.scale * scale;
         }
 
         public static List<CreatureModel> GetCreaturesInRange(Vector3 center, float radius)
@@ -188,20 +292,42 @@ namespace Tuantu.InfluenceCreature
             {
                 return;
             }
+            UpdateAttackRange();
+            if (_spikesLeft > 0)
+            {
+                _spikeTimer.RunTimer();
+                if (!_spikeTimer.started)
+                {
+                    SpawnNextSpike();
+                }
+            }
             if (_skillCoolTimer.started)
             {
-                if(_isBattle && _skillEffect.activeInHierarchy)
+                if(_isBattle && _skillEffect != null && _skillEffect.activeInHierarchy)
                 {
                     SetEffectActive(state:false);
                 }
-                if (!_skillCoolTimer.RunTimer())
-                {
-                }
+                _skillCoolTimer.RunTimer();
             }
-            else if(_isBattle && !_skillEffect.activeInHierarchy)
+            else if(_isBattle && _skillEffect != null && !_skillEffect.activeInHierarchy)
             {
                 SetEffectActive(state:true);
             }
+        }
+
+        private void UpdateAttackRange()
+        {
+            if (movable == null || _normalRange <= 0f) return;
+
+            bool skillReady = !_skillCoolTimer.started && _spikesLeft == 0;
+            float spikeScale = movable.currentScale * _spikeSizeMultiplier;
+            float spikeWidth = _spikeGap;
+            if (Add_On.instance.EffectList.TryGetValue("Influence_Spike", out var data))
+            {
+                spikeWidth = GetSpikeWidth(data, spikeScale);
+            }
+            float spikeReach = spikeWidth * _maxSpikes;
+            base.model.metaInfo.range = skillReady ? spikeReach : _normalRange;
         }
 
         private Vector3 GetPassageEndInFront()
