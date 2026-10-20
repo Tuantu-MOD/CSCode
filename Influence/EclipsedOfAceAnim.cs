@@ -18,12 +18,12 @@ public class EclipsedOfAceAnim : CreatureAnimScript
 
     public void OnMove()
     {
-        animator.AnimationState.SetAnimation(0, "Idle", true);
+        animator.AnimationState.SetAnimation(0, "Walk", true);
     }
 
     public void Idle()
     {
-        animator.AnimationState.SetAnimation(0, "Standing_1", true);
+        animator.AnimationState.SetAnimation(0, "Idle", true);
     }
 
     public void Attack()
@@ -35,14 +35,14 @@ public class EclipsedOfAceAnim : CreatureAnimScript
     
     public void attack_bigsword()
     {
-        TrackEntry entry = animator.AnimationState.SetAnimation(0, "Attack", false);
+        TrackEntry entry = animator.AnimationState.SetAnimation(0, "Slam", false);
         entry.Event += attack_bigsword;
         entry.Complete += AttackEnd;
     }
 
     public void attack_beam()
     {
-        TrackEntry entry = animator.AnimationState.SetAnimation(0, "Attack", false);
+        TrackEntry entry = animator.AnimationState.SetAnimation(0, "Slam", false);
         entry.Event += attack_beam;
         entry.Complete += AttackEnd;
     }
